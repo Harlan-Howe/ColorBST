@@ -54,7 +54,7 @@ class ColorTreeNode:
                      pt2=(right_mid, y + VERTICAL_OFFSET),
                      color=(255, 255, 255),
                      thickness=1)
-            self.leftNode.drawSelfInBox(canvas=canvas, min_x=mid_x, max_x=max_x, y=y + VERTICAL_OFFSET)
+            self.rightNode.drawSelfInBox(canvas=canvas, min_x=mid_x, max_x=max_x, y=y + VERTICAL_OFFSET)
 
 
 class ColorTree:
