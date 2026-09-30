@@ -23,12 +23,12 @@ def start():
     display.potential_colors = potential_colors
 
 
-    for i in range(32):
-        col = potential_colors.pop(0)
-        color_List.append(col)
-        tree.add(col)
-        display.selected_color = None
-        display.display(wait_for_key=200, destroy_windows= False)
+    # for i in range(32):
+    #     col = potential_colors.pop(0)
+    #     color_List.append(col)
+    #     tree.add(col)
+    #     display.selected_color = None
+    display.display(wait_for_key=-1, destroy_windows= False)
 
     cv2.waitKey()
     cv2.destroyAllWindows()
