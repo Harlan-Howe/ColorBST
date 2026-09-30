@@ -7,12 +7,26 @@ from numpy import dtype, float64, ndarray
 from BSTColor import BSTColor
 from ColorTree import ColorTree, ColorTreeNode
 
+BUTTON_HEIGHT = 50
+
+TOP_OF_BUTTONS = 700
+
+WINDOW_WIDTH = 1000
+
+HEIGHT_OF_BOXES_IN_ROWS = 20
+TOP_OF_REVERSE_LIST = 660
+TOP_OF_FORWARD_LIST = 600
+TOP_OF_ADDED_LIST = 90
+TOP_OF_POTENTIAL_LIST = 30
+
 
 class ColorBSTDisplay:
     def __init__(self, t: ColorTree):
-        self.added_colors  = []
-        self.potential_colors = []
-        self.dimensions = (800,1000,3)
+        self.added_colors: List[BSTColor]  = []
+        self.potential_colors: List[BSTColor] = []
+        self.sorted_colors: List[BSTColor] = []
+        self.reversed_colors: List[BSTColor] = []
+        self.dimensions = (800, WINDOW_WIDTH, 3)
         self.tree = t
         self.selected_color = None
         cv2.namedWindow("Display")
@@ -22,13 +36,16 @@ class ColorBSTDisplay:
     def display(self, wait_for_key:int = 0, destroy_windows:bool = True):
         canvas = np.zeros(shape=self.dimensions, dtype=np.uint8)
 
+        if self.selected_color is None and len(self.potential_colors)>0:
+            self.selected_color = self.potential_colors[0]
+
         cv2.putText(img=canvas,
                     text="Potential:",
                     org=(10,20),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale= 1.0,
                     color=(255,255,0))
-        self.draw_row_of_boxes_for_list(canvas, self.potential_colors, 30)
+        self.draw_row_of_boxes_for_list(canvas, self.potential_colors, TOP_OF_POTENTIAL_LIST)
 
         cv2.putText(img=canvas,
                     text="Added:",
@@ -36,7 +53,7 @@ class ColorBSTDisplay:
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=1.0,
                     color=(255, 255, 0))
-        self.draw_row_of_boxes_for_list(canvas, self.added_colors, 90)
+        self.draw_row_of_boxes_for_list(canvas, self.added_colors, TOP_OF_ADDED_LIST)
 
         # if len(self.colorList) > 0:
         #     width_per_box = self.dimensions[1]//len(self.colorList)
@@ -71,8 +88,8 @@ class ColorBSTDisplay:
 
     def draw_buttons(self, canvas: Any):
         cv2.rectangle(img=canvas,
-                      pt1=(0, 700),
-                      pt2=(canvas.shape[1] // 3, 750),
+                      pt1=(0, TOP_OF_BUTTONS),
+                      pt2=(canvas.shape[1] // 3, TOP_OF_BUTTONS + BUTTON_HEIGHT),
                       color=(128, 235, 250),
                       thickness=-1)
         (w, h), base = cv2.getTextSize(text="Add", fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, thickness=1);
@@ -80,8 +97,8 @@ class ColorBSTDisplay:
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, color=(0, 0, 0))
 
         cv2.rectangle(img=canvas,
-                      pt1=(canvas.shape[1] // 3, 700),
-                      pt2=(2 * canvas.shape[1] // 3, 750),
+                      pt1=(canvas.shape[1] // 3, TOP_OF_BUTTONS),
+                      pt2=(2 * canvas.shape[1] // 3, TOP_OF_BUTTONS + BUTTON_HEIGHT),
                       color=(255, 128, 230),
                       thickness=-1)
         (w, h), base = cv2.getTextSize(text="Find", fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, thickness=1);
@@ -89,8 +106,8 @@ class ColorBSTDisplay:
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, color=(0, 0, 0))
 
         cv2.rectangle(img=canvas,
-                      pt1=(2 * canvas.shape[1] // 3, 700),
-                      pt2=(canvas.shape[1], 750),
+                      pt1=(2 * canvas.shape[1] // 3, TOP_OF_BUTTONS),
+                      pt2=(canvas.shape[1], TOP_OF_BUTTONS + BUTTON_HEIGHT),
                       color=(128, 235, 250),
                       thickness=-1)
         (w, h), base = cv2.getTextSize(text="Remove", fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, thickness=1);
@@ -98,29 +115,29 @@ class ColorBSTDisplay:
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, color=(0, 0, 0))
 
     def show_list_in_reverse_order(self, canvas: Any):
-        inverted_colors = []
-        self.tree.put_colors_in_list_reversed(inverted_colors)
+        self.reversed_colors = []
+        self.tree.put_colors_in_list_reversed(self.reversed_colors)
 
-        if len(inverted_colors) > 0:
+        if len(self.reversed_colors) > 0:
             cv2.putText(img=canvas,
                         text="ReverseOrder:",
                         org=(10, 650),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                         fontScale=1,
                         color=(255, 255, 0))
-            self.draw_row_of_boxes_for_list(canvas, inverted_colors, 660)
+            self.draw_row_of_boxes_for_list(canvas, self.reversed_colors, TOP_OF_REVERSE_LIST)
 
     def showListInOrder(self, canvas: Any):
-        sorted_colors = []
-        self.tree.put_colors_in_list_forward(sorted_colors)
-        if len(sorted_colors) > 0:
+        self.sorted_colors = []
+        self.tree.put_colors_in_list_forward(self.sorted_colors)
+        if len(self.sorted_colors) > 0:
             cv2.putText(img=canvas,
                         text="InOrder:",
                         org=(10, 590),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                         fontScale=1,
                         color=(255, 255, 0))
-            self.draw_row_of_boxes_for_list(canvas, sorted_colors, 600)
+            self.draw_row_of_boxes_for_list(canvas, self.sorted_colors, TOP_OF_FORWARD_LIST)
 
     def draw_row_of_boxes_for_list(self, canvas: np.ndarray, list_to_draw: List[BSTColor], y:int):
         if len(list_to_draw) > 0:
@@ -128,9 +145,15 @@ class ColorBSTDisplay:
             for i in range(len(list_to_draw)):
                 cv2.rectangle(img=canvas,
                               pt1=(int(i*width_per_box),y),
-                              pt2=(int((i+1)*width_per_box),y+20),
+                              pt2=(int((i+1)*width_per_box), y + HEIGHT_OF_BOXES_IN_ROWS),
                               color=list_to_draw[i].BGR_color,
                               thickness=-1)
+                if list_to_draw[i] == self.selected_color:
+                    cv2.rectangle(img=canvas,
+                                  pt1=(int(i * width_per_box)+1, y+1),
+                                  pt2=(int((i + 1) * width_per_box) - 1, y + HEIGHT_OF_BOXES_IN_ROWS - 1),
+                                  color=(255,255,255),
+                                  thickness=2)
                 cv2.putText(img=canvas,
                             text=list_to_draw[i].letter,
                             org=(int((i+0.5) * width_per_box - 5), y+15),
@@ -138,6 +161,40 @@ class ColorBSTDisplay:
                             fontScale=0.33,
                             color=(0, 0, 0))
 
+    def handle_add_button(self):
+        print("Add")
+
+    def handle_find_button(self):
+        print("Find!")
+
+    def handle_remove_button(self):
+        print("Remove!")
+
+
+
     def handle_mouse_click(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONUP:
             print(f"Mouse clicked at ({x}, {y}).")
+            if TOP_OF_POTENTIAL_LIST <= y <= TOP_OF_POTENTIAL_LIST+HEIGHT_OF_BOXES_IN_ROWS:
+                box_width = WINDOW_WIDTH / len(self.potential_colors)
+                self.selected_color=self.potential_colors[int(x/box_width)]
+                self.display(wait_for_key=-1,destroy_windows=False)
+            elif TOP_OF_ADDED_LIST <= y <= TOP_OF_ADDED_LIST+HEIGHT_OF_BOXES_IN_ROWS:
+                box_width = WINDOW_WIDTH / len(self.added_colors)
+                self.selected_color = self.added_colors[int(x / box_width)]
+                self.display(wait_for_key=-1, destroy_windows=False)
+            elif TOP_OF_FORWARD_LIST <= y <= TOP_OF_FORWARD_LIST + HEIGHT_OF_BOXES_IN_ROWS:
+                box_width = WINDOW_WIDTH / len(self.sorted_colors)
+                self.selected_color = self.sorted_colors[int(x / box_width)]
+                self.display(wait_for_key=-1, destroy_windows=False)
+            elif TOP_OF_REVERSE_LIST <= y <= TOP_OF_REVERSE_LIST + HEIGHT_OF_BOXES_IN_ROWS:
+                box_width = WINDOW_WIDTH / len(self.reversed_colors)
+                self.selected_color = self.reversed_colors[int(x / box_width)]
+                self.display(wait_for_key=-1, destroy_windows=False)
+            elif TOP_OF_BUTTONS <= y <= TOP_OF_BUTTONS + BUTTON_HEIGHT:
+                if x < WINDOW_WIDTH/3:
+                    self.handle_add_button()
+                elif x > 2*WINDOW_WIDTH/3:
+                    self.handle_remove_button()
+                else:
+                    self.handle_find_button()
