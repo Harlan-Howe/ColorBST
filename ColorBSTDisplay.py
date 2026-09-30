@@ -173,10 +173,18 @@ class ColorBSTDisplay:
             self.display(wait_for_key=-1, destroy_windows=False)
 
     def handle_find_button(self):
-        print("Find!")
+        if self.selected_color is None:
+            return
+        result:bool = self.tree.find(self.selected_color)
+        print(f"{result}")
 
     def handle_remove_button(self):
-        print("Remove!")
+        if self.selected_color is None:
+            return
+        succeeded:bool = self.tree.remove(self.selected_color)
+        if succeeded:
+            self.added_colors.remove(self.selected_color)
+            self.display(wait_for_key=-1, destroy_windows=False)
 
 
 
