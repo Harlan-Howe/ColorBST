@@ -17,7 +17,7 @@ class BSTColor:
         print (self.__letter)
 
     @property
-    def BGRImage(self):
+    def BGR_color(self):
         return self.__BGR
 
     @property
