@@ -90,6 +90,13 @@ class ColorTreeNode:
         if self.leftNode is not None:
             self.leftNode.get_colors_in_reverse_order(list)
 
+    def get_depth(self) -> int:
+        d=1
+        if self.leftNode is not None:
+            d += self.leftNode.get_depth()
+        if self.rightNode is not None:
+            d += self.rightNode.get_depth()
+        return d
 
 
 class ColorTree:
@@ -108,10 +115,16 @@ class ColorTree:
             return
         self.root.draw_self_in_box(canvas, min_x=0, max_x = canvas.shape[1], y=115)
 
-    def get_colors_in_order(self, list:List[BSTColor]):
+    def put_colors_in_list_forward(self, list:List[BSTColor]):
         if self.root is not None:
             self.root.get_colors_in_order(list)
 
-    def get_colors_in_reverse_order(self, list:List[BSTColor]):
+    def put_colors_in_list_reversed(self, list:List[BSTColor]):
         if self.root is not None:
             self.root.get_colors_in_reverse_order(list)
+
+    def get_depth(self) -> int :
+        if self.root is None:
+            return -1
+        else:
+            return self.root.get_depth()
