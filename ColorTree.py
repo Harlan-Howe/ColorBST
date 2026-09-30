@@ -130,3 +130,9 @@ class ColorTree:
             return -1
         else:
             return self.root.get_depth()-1
+
+    def find(self, target: BSTColor) -> bool:
+        return False
+
+    def remove(self, target: BSTColor) -> bool:
+        return False
