@@ -129,4 +129,4 @@ class ColorTree:
         if self.root is None:
             return -1
         else:
-            return self.root.get_depth()
+            return self.root.get_depth()-1
