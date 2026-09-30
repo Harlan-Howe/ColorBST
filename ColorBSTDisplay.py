@@ -50,7 +50,10 @@ class ColorBSTDisplay:
         #                     color=(0, 0, 0))
         self.tree.draw_self(canvas)
 
-
+        depth = self.tree.get_depth()
+        if depth != -1:
+            cv2.putText(img=canvas, text=f"Depth: {depth}", org=(10,150),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color = (255,128,255))
 
 
 
