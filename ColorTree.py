@@ -92,11 +92,13 @@ class ColorTreeNode:
 
     def get_depth(self) -> int:
         d=1
+        l=0
+        r=0
         if self.leftNode is not None:
-            d += self.leftNode.get_depth()
+            l = self.leftNode.get_depth()
         if self.rightNode is not None:
-            d += self.rightNode.get_depth()
-        return d
+            r = self.rightNode.get_depth()
+        return d + max(l, r)
 
 
 class ColorTree:
