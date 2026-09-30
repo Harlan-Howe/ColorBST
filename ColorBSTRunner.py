@@ -3,22 +3,35 @@ import cv2
 
 from BSTColor import BSTColor
 from ColorBSTDisplay import ColorBSTDisplay
-from ColorTree import ColorTree
+from ColorTree import ColorTree, ColorTreeNode
 
-colorList:List[BSTColor] = []
-tree = ColorTree()
+def start():
 
-display = ColorBSTDisplay(tree)
-display.colorList = colorList
+    color_List:List[BSTColor] = []
+    potential_colors:List[BSTColor] = []
+
+    for i in range(64):
+        potential_colors.append(BSTColor())
+
+    tree = ColorTree()
+
+    display = ColorBSTDisplay(tree)
+    ColorTreeNode.display = display
 
 
-for i in range(32):
-    col = BSTColor()
-    colorList.append(col)
-    tree.add(col)
-    display.display(wait_for_key=False)
-    cv2.waitKey(200)
+    display.added_colors = color_List
+    display.potential_colors = potential_colors
 
-cv2.waitKey()
-cv2.destroyAllWindows()
 
+    for i in range(32):
+        col = BSTColor()
+        color_List.append(potential_colors.pop(0))
+        tree.add(col)
+        display.display(wait_for_key=200, destroy_windows= False)
+
+
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    start()
