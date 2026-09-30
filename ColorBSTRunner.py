@@ -24,11 +24,11 @@ def start():
 
 
     for i in range(32):
-        col = BSTColor()
-        color_List.append(potential_colors.pop(0))
+        col = potential_colors.pop(0)
+        color_List.append(col)
         tree.add(col)
+        display.selected_color = None
         display.display(wait_for_key=200, destroy_windows= False)
-
 
     cv2.waitKey()
     cv2.destroyAllWindows()
