@@ -63,12 +63,16 @@ class ColorBSTDisplay:
 
     def draw_row_of_boxes_for_list(self, canvas: np.ndarray, list_to_draw: List[BSTColor], y:int):
         if len(list_to_draw) > 0:
-            width_per_box = self.dimensions[1]//len(list_to_draw)
+            width_per_box = self.dimensions[1]/len(list_to_draw)
             for i in range(len(list_to_draw)):
-                cv2.rectangle(img=canvas, pt1=(i*width_per_box,y), pt2=((i+1)*width_per_box,y+20), color=list_to_draw[i].BGR_color, thickness=-1)
+                cv2.rectangle(img=canvas,
+                              pt1=(int(i*width_per_box),y),
+                              pt2=(int((i+1)*width_per_box),y+20),
+                              color=list_to_draw[i].BGR_color,
+                              thickness=-1)
                 cv2.putText(img=canvas,
                             text=list_to_draw[i].letter,
-                            org=(i * width_per_box + 10, y+15),
+                            org=(int((i+0.5) * width_per_box - 5), y+15),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                             fontScale=0.33,
                             color=(0, 0, 0))
