@@ -73,11 +73,24 @@ class ColorTreeNode:
             self.rightNode.draw_self_in_box(canvas=canvas, min_x=mid_x, max_x=max_x, y=y + VERTICAL_OFFSET)
 
     def get_colors_in_order(self, list:List[BSTColor]):
+        if self.value is None:
+            return
         if self.leftNode is not None:
             self.leftNode.get_colors_in_order(list)
         list.append(self.value)
         if self.rightNode is not None:
             self.rightNode.get_colors_in_order(list)
+
+    def get_colors_in_reverse_order(self, list:List[BSTColor]):
+        if self.value is None:
+            return
+        if self.rightNode is not None:
+            self.rightNode.get_colors_in_reverse_order(list)
+        list.append(self.value)
+        if self.leftNode is not None:
+            self.leftNode.get_colors_in_reverse_order(list)
+
+
 
 class ColorTree:
     def __init__(self):
@@ -95,7 +108,10 @@ class ColorTree:
             return
         self.root.draw_self_in_box(canvas, min_x=0, max_x = canvas.shape[1], y=115)
 
-    def get_colors_in_order(self, list_:List[BSTColor]):
+    def get_colors_in_order(self, list:List[BSTColor]):
         if self.root is not None:
-            self.root.get_colors_in_order(list_)
+            self.root.get_colors_in_order(list)
 
+    def get_colors_in_reverse_order(self, list:List[BSTColor]):
+        if self.root is not None:
+            self.root.get_colors_in_reverse_order(list)

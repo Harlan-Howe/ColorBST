@@ -1,7 +1,8 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 
 import cv2
 import numpy as np
+from numpy import dtype, float64, ndarray
 
 from BSTColor import BSTColor
 from ColorTree import ColorTree, ColorTreeNode
@@ -49,10 +50,17 @@ class ColorBSTDisplay:
         #                     color=(0, 0, 0))
         self.tree.draw_self(canvas)
 
-        sorted_colors = []
-        self.tree.get_colors_in_order(sorted_colors)
+        self.showListInOrder(canvas)
 
-        self.draw_row_of_boxes_for_list(canvas, sorted_colors, 600)
+        self.show_list_in_reverse_order(canvas)
+
+        cv2.rectangle(img=canvas,
+                      pt1=(0,700),
+                      pt2=(canvas.shape[1]//3, 750),
+                      color=(0,235,250),
+                      thickness = -1)
+
+
 
 
         cv2.imshow("Display", canvas)
@@ -60,6 +68,31 @@ class ColorBSTDisplay:
             cv2.waitKey(wait_for_key)
         if destroy_windows:
             cv2.destroyAllWindows()
+
+    def show_list_in_reverse_order(self, canvas: Any):
+        inverted_colors = []
+        self.tree.get_colors_in_reverse_order(inverted_colors)
+
+        if len(inverted_colors) > 0:
+            cv2.putText(img=canvas,
+                        text="ReverseOrder:",
+                        org=(10, 650),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale=1,
+                        color=(255, 255, 0))
+            self.draw_row_of_boxes_for_list(canvas, inverted_colors, 660)
+
+    def showListInOrder(self, canvas: Any):
+        sorted_colors = []
+        self.tree.get_colors_in_order(sorted_colors)
+        if len(sorted_colors) > 0:
+            cv2.putText(img=canvas,
+                        text="InOrder:",
+                        org=(10, 590),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale=1,
+                        color=(255, 255, 0))
+            self.draw_row_of_boxes_for_list(canvas, sorted_colors, 600)
 
     def draw_row_of_boxes_for_list(self, canvas: np.ndarray, list_to_draw: List[BSTColor], y:int):
         if len(list_to_draw) > 0:
