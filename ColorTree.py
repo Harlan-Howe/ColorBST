@@ -100,6 +100,11 @@ class ColorTreeNode:
             r = self.rightNode.get_depth()
         return d + max(l, r)
 
+    def find(self, target: BSTColor) -> bool:
+        return False
+
+    def remove(self, target: BSTColor) -> bool:
+        return False
 
 class ColorTree:
     def __init__(self):
@@ -132,7 +137,11 @@ class ColorTree:
             return self.root.get_depth()-1
 
     def find(self, target: BSTColor) -> bool:
-        return False
+        if self.root is None:
+            return False
+        return self.root.find(target)
 
     def remove(self, target: BSTColor) -> bool:
-        return False
+        if self.root is None:
+            return False
+        return self.root.remove(target)
