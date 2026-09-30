@@ -162,7 +162,15 @@ class ColorBSTDisplay:
                             color=(0, 0, 0))
 
     def handle_add_button(self):
-        print("Add")
+        if self.selected_color is not None:
+            self.tree.add(self.selected_color)
+            self.added_colors.append(self.selected_color)
+            self.potential_colors.remove(self.selected_color)
+            if len(self.potential_colors) == 0:
+                for _ in range(32):
+                    self.potential_colors.append(BSTColor())
+            self.selected_color = None
+            self.display(wait_for_key=-1, destroy_windows=False)
 
     def handle_find_button(self):
         print("Find!")
