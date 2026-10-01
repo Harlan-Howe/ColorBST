@@ -119,19 +119,38 @@ class ColorTreeNode:
         self.isSelected = False
         print(f"Just made a node with color: {color}")
 
-    def add(self, color:BSTColor):
-        if color.hue < self.value.hue:
-            if self.leftNode is None:
-                self.leftNode = ColorTreeNode(color = color)
-            else:
-                self.leftNode.add(color)
-        else:
-            if self.rightNode is None:
-                self.rightNode = ColorTreeNode(color = color)
-            else:
-                self.rightNode.add(color)
+    def add(self, color:BSTColor) -> None:
+        """
+        adds the given BSTColor to the (sub?)tree rooted by this node.
+        :param color: the BSTColor object to add
+        """
 
-    def draw_self_in_box(self, canvas: np.ndarray, min_x: int, max_x: int, y: int):
+        if self.value is None:
+            raise Exception("Something went wrong... this node has no color.")
+        # TODO # 0: You need to write this!
+
+        #  The assumption is that if you are here, this node already has a color, so you need to either tell a subtree
+        #  to add this, or create a child with this color. To start with, you'll need one of the following, depending
+        #  on what you want to sort by:
+
+        # if color.hue < self.value.hue:
+        # or
+        # if color.letter < self.value.letter:
+        # or
+        # if color.brightness < self.value.brightness:
+        # or
+        # if color.saturation < self.value.saturation:
+
+    def draw_self_in_box(self, canvas: np.ndarray, min_x: int, max_x: int, y: int) -> None:
+        """
+        draws the (sub?)tree rooted by this node in the canvas so that it fits in the specified range. (Note: this
+        may overflow the max_x if the range is too skinny.
+        :param canvas: the 2d x 3 color ndarray to draw into
+        :param min_x: the left edge of where this subtree can be drawn
+        :param max_x: the right edge (ideally) where this subtreen can be drawn
+        :param y: the top edge of this particular node
+        """
+        # I've written this one for you.
         if self.value is None:
             return
         mid_x = (min_x+max_x)//2
@@ -146,19 +165,25 @@ class ColorTreeNode:
                     fontFace= cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.33,
                     color = (0,0,0))
-        if self.isSelected:
+        if self.isSelected:  # potentially highlight this node.
             cv2.rectangle(img=canvas,
                           pt1=(mid_x - BOX_SIZE // 2-1, y-1),
                           pt2=(mid_x + BOX_SIZE // 2+1, y + BOX_SIZE+1),
                           color=(255,255,255),
                           thickness=2)
+            cv2.rectangle(img=canvas,
+                          pt1=(mid_x - BOX_SIZE // 2 - 1, y - 1),
+                          pt2=(mid_x + BOX_SIZE // 2 + 1, y + BOX_SIZE + 1),
+                          color=(0, 0, 0),
+                          thickness=1)
+        # recursive calls to the left and right children....
         if self.leftNode is not None:
             left_mid = (min_x + mid_x)//2
             cv2.line(img=canvas,
                      pt1=(mid_x,y+BOX_SIZE),
                      pt2=(left_mid, y+VERTICAL_OFFSET),
                      color=(255,255,255),
-                     thickness=1)
+                     thickness=1) # drawing connective line to left child
             self.leftNode.draw_self_in_box(canvas=canvas, min_x=min_x, max_x=mid_x, y =y + VERTICAL_OFFSET)
         if self.rightNode is not None:
             right_mid = (mid_x + max_x) // 2
@@ -166,44 +191,65 @@ class ColorTreeNode:
                      pt1=(mid_x, y + BOX_SIZE),
                      pt2=(right_mid, y + VERTICAL_OFFSET),
                      color=(255, 255, 255),
-                     thickness=1)
+                     thickness=1) # drawing connective line to right child
             self.rightNode.draw_self_in_box(canvas=canvas, min_x=mid_x, max_x=max_x, y=y + VERTICAL_OFFSET)
 
-    def get_colors_in_order(self, list:List[BSTColor]):
+    def get_colors_in_order(self, list_of_colors:List[BSTColor]) -> None:
+        """
+        appends all the colors in the (sub?)tree rooted by this node into the list_of_colors given, in ascending order.
+        :param list_of_colors: the (preexisting) list of colors to grow
+        """
         if self.value is None:
             return
-        if self.leftNode is not None:
-            self.leftNode.get_colors_in_order(list)
-        list.append(self.value)
-        if self.rightNode is not None:
-            self.rightNode.get_colors_in_order(list)
+        # TODO - you write this. Hint: this is recursive.
 
-    def get_colors_in_reverse_order(self, list:List[BSTColor]):
+    def get_colors_in_reverse_order(self, list_of_colors:List[BSTColor]) -> None:
+        """
+       appends all the colors in the (sub?)tree rooted by this node into the list_of_colors given, in descending order.
+       :param list_of_colors: the (preexisting) list of colors to grow
+       """
         if self.value is None:
             return
-        if self.rightNode is not None:
-            self.rightNode.get_colors_in_reverse_order(list)
-        list.append(self.value)
-        if self.leftNode is not None:
-            self.leftNode.get_colors_in_reverse_order(list)
+        # TODO - you write this. Hint: this is recursive.
 
     def get_depth(self) -> int:
-        d=1
-        l=0
-        r=0
-        if self.leftNode is not None:
-            l = self.leftNode.get_depth()
-        if self.rightNode is not None:
-            r = self.rightNode.get_depth()
-        return d + max(l, r)
+        """
+        finds the maximum depth of the (sub?)tree rooted by this node, plus one for this node.
+        :return: the max depth + 1
+        """
+        # TODO - you write this. Hint: this is recursive.
+
+        # return 1 for this node, plus the maximum depth of left and right.
+
+        return 1  # replace this with your code.
 
     def contains(self, target: BSTColor) -> bool:
+        """
+        determines whether the given target BSTColor object is part of the (sub?)tree rooted by this node, including
+        this node, itself.
+        :param target: the BSTColor we are looking for.
+        :return: whether the target is found.
+        """
+        # TODO - you write this. Hint: this is recursive.
+        # If you're feeling fancy: if this is the matching node, set self.isSelected to True.
+
         return False
+
+    def clear_all_selections(self) -> None:
+        """
+        turns off "isSelected" for all ColorNodes in the (sub?)tree rooted by this node.
+        """
+        self.isSelected = False;
+        if self.leftNode is not None:
+            self.leftNode.clear_all_selections()
+        if self.rightNode is not None:
+            self.rightNode.clear_all_selections()
 
     def size(self) -> int:
         """
         :return: the number of BSTColor objects in the subtree rooted by this node.
         """
+        # I've written this one for you.
         result = 1
         if self.leftNode is not None:
             result += self.leftNode.size()
