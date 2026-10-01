@@ -86,6 +86,9 @@ class ColorTree:
         """
         if self.root is None:
             return False
+        # TODO (after all others): you need to write this method.
+
+        # this is probably the hardest method to write - please see the GoogleDoc instructions for what needs to happen.
 
         return False  # replace this with your code.
 
@@ -98,6 +101,14 @@ class ColorTree:
             return 0
         return self.root.size()
 
+    def clear_all_selections(self):
+        """
+        turns off "isSelected" for all nodes in this tree.
+        """
+        #  I have written this method for you.
+        if self.root is None:
+            return
+        self.root.clear_all_selections()
 
 # =============================================================================================
 # =============================================================================================
