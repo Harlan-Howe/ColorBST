@@ -24,6 +24,9 @@ class ColorTree:
         else:
             self.root.add(color)
 
+    def isEmpty(self) -> bool:
+        return self.root is None
+
     def draw_self(self, canvas: np.ndarray) -> None:
         """
         Draws a representation of the tree in the canvas
