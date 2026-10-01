@@ -40,6 +40,7 @@ class ColorBSTDisplay:
         if self.selected_color is None and len(self.potential_colors)>0:
             self.selected_color = self.potential_colors[0]
 
+        # draw the row of potential colors
         cv2.putText(img=canvas,
                     text="Potential:",
                     org=(10,20),
@@ -48,6 +49,7 @@ class ColorBSTDisplay:
                     color=(255,255,0))
         self.draw_row_of_boxes_for_list(canvas, self.potential_colors, TOP_OF_POTENTIAL_LIST)
 
+        # draw the row of added colors, if any.
         cv2.putText(img=canvas,
                     text="Added:",
                     org=(10, 80),
@@ -56,27 +58,12 @@ class ColorBSTDisplay:
                     color=(255, 255, 0))
         self.draw_row_of_boxes_for_list(canvas, self.added_colors, TOP_OF_ADDED_LIST)
 
-        # if len(self.colorList) > 0:
-        #     width_per_box = self.dimensions[1]//len(self.colorList)
-        #     for i in range(len(self.colorList)):
-        #         cv2.rectangle(img=canvas, pt1=(i*width_per_box,0),pt2=((i+1)*width_per_box,20), color=self.colorList[i].BGR,thickness=-1)
-        #         cv2.putText(img=canvas,
-        #                     text=self.colorList[i].letter,
-        #                     org=(i * width_per_box + 10, 15),
-        #                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-        #                     fontScale=0.33,
-        #                     color=(0, 0, 0))
         self.tree.draw_self(canvas)
-
         self.draw_depth(canvas)
-
+        self.draw_size(canvas)
         self.draw_message(canvas)
-
-
         self.showListInOrder(canvas)
-
         self.show_list_in_reverse_order(canvas)
-
         self.draw_buttons(canvas)
 
         cv2.imshow("Display", canvas)
@@ -84,6 +71,12 @@ class ColorBSTDisplay:
             cv2.waitKey(wait_for_key)
         if destroy_windows:
             cv2.destroyAllWindows()
+
+    def draw_size(self, canvas: Any):
+        size_string = f"Size: {self.tree.size()}"
+        (w, h), bsln = cv2.getTextSize(text=size_string, fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, thickness=1)
+        cv2.putText(img=canvas, text=size_string, org=(WINDOW_WIDTH - 10 - w, 150),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 128, 255))
 
     def draw_message(self, canvas: Any):
         if self.message is not None:
