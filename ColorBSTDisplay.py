@@ -35,6 +35,12 @@ class ColorBSTDisplay:
 
 
     def display(self, wait_for_key:int = 0, destroy_windows:bool = True):
+        """
+        draws the screen. May have a delay for the user to press a key and potentially close the window afterwards.
+        :param wait_for_key: the amount of time (in ms) to pause the program (waiting for the user to press a key)
+                             or -1, which means don't wait.
+        :param destroy_windows: whether to close this window after the method is complete.
+        """
         canvas = np.zeros(shape=self.dimensions, dtype=np.uint8)
 
         if self.selected_color is None and len(self.potential_colors)>0:
@@ -72,6 +78,34 @@ class ColorBSTDisplay:
         if destroy_windows:
             cv2.destroyAllWindows()
 
+    def draw_row_of_boxes_for_list(self, canvas: np.ndarray, list_to_draw: List[BSTColor], y:int):
+        if len(list_to_draw) > 0:
+            width_per_box = self.dimensions[1]/len(list_to_draw)
+            for i in range(len(list_to_draw)):
+                cv2.rectangle(img=canvas,
+                              pt1=(int(i*width_per_box),y),
+                              pt2=(int((i+1)*width_per_box), y + HEIGHT_OF_BOXES_IN_ROWS),
+                              color=list_to_draw[i].BGR_color,
+                              thickness=-1)
+                if list_to_draw[i] == self.selected_color:
+                    cv2.rectangle(img=canvas,
+                                  pt1=(int(i * width_per_box)+1, y+1),
+                                  pt2=(int((i + 1) * width_per_box) - 1, y + HEIGHT_OF_BOXES_IN_ROWS - 1),
+                                  color=(255,255,255),
+                                  thickness=2)
+                cv2.putText(img=canvas,
+                            text=list_to_draw[i].letter,
+                            org=(int((i+0.5) * width_per_box - 5), y+15),
+                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                            fontScale=0.33,
+                            color=(0, 0, 0))
+
+    def draw_depth(self, canvas: Any):
+        depth = self.tree.get_depth()
+        if depth != -1:
+            cv2.putText(img=canvas, text=f"Depth: {depth}", org=(10, 150),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 128, 255))
+
     def draw_size(self, canvas: Any):
         size_string = f"Size: {self.tree.size()}"
         (w, h), bsln = cv2.getTextSize(text=size_string, fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, thickness=1)
@@ -85,11 +119,30 @@ class ColorBSTDisplay:
             cv2.putText(img=canvas, text=self.message, org=(WINDOW_WIDTH - 10 - w, TOP_OF_FORWARD_LIST - 5),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 255, 255))
 
-    def draw_depth(self, canvas: Any):
-        depth = self.tree.get_depth()
-        if depth != -1:
-            cv2.putText(img=canvas, text=f"Depth: {depth}", org=(10, 150),
-                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 128, 255))
+    def showListInOrder(self, canvas: Any):
+        self.sorted_colors = []
+        self.tree.put_colors_in_list_forward(self.sorted_colors)
+        if len(self.sorted_colors) > 0:
+            cv2.putText(img=canvas,
+                        text="InOrder:",
+                        org=(10, 590),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale=1,
+                        color=(255, 255, 0))
+            self.draw_row_of_boxes_for_list(canvas, self.sorted_colors, TOP_OF_FORWARD_LIST)
+
+    def show_list_in_reverse_order(self, canvas: Any):
+        self.reversed_colors = []
+        self.tree.put_colors_in_list_reversed(self.reversed_colors)
+
+        if len(self.reversed_colors) > 0:
+            cv2.putText(img=canvas,
+                        text="ReverseOrder:",
+                        org=(10, 650),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale=1,
+                        color=(255, 255, 0))
+            self.draw_row_of_boxes_for_list(canvas, self.reversed_colors, TOP_OF_REVERSE_LIST)
 
     def draw_buttons(self, canvas: Any):
         cv2.rectangle(img=canvas,
@@ -118,53 +171,6 @@ class ColorBSTDisplay:
         (w, h), base = cv2.getTextSize(text="Remove", fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, thickness=1);
         cv2.putText(img=canvas, text="Remove", org=(5 * canvas.shape[1] // 6 - w // 2, 725 + h // 2),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, color=(0, 0, 0))
-
-    def show_list_in_reverse_order(self, canvas: Any):
-        self.reversed_colors = []
-        self.tree.put_colors_in_list_reversed(self.reversed_colors)
-
-        if len(self.reversed_colors) > 0:
-            cv2.putText(img=canvas,
-                        text="ReverseOrder:",
-                        org=(10, 650),
-                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                        fontScale=1,
-                        color=(255, 255, 0))
-            self.draw_row_of_boxes_for_list(canvas, self.reversed_colors, TOP_OF_REVERSE_LIST)
-
-    def showListInOrder(self, canvas: Any):
-        self.sorted_colors = []
-        self.tree.put_colors_in_list_forward(self.sorted_colors)
-        if len(self.sorted_colors) > 0:
-            cv2.putText(img=canvas,
-                        text="InOrder:",
-                        org=(10, 590),
-                        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                        fontScale=1,
-                        color=(255, 255, 0))
-            self.draw_row_of_boxes_for_list(canvas, self.sorted_colors, TOP_OF_FORWARD_LIST)
-
-    def draw_row_of_boxes_for_list(self, canvas: np.ndarray, list_to_draw: List[BSTColor], y:int):
-        if len(list_to_draw) > 0:
-            width_per_box = self.dimensions[1]/len(list_to_draw)
-            for i in range(len(list_to_draw)):
-                cv2.rectangle(img=canvas,
-                              pt1=(int(i*width_per_box),y),
-                              pt2=(int((i+1)*width_per_box), y + HEIGHT_OF_BOXES_IN_ROWS),
-                              color=list_to_draw[i].BGR_color,
-                              thickness=-1)
-                if list_to_draw[i] == self.selected_color:
-                    cv2.rectangle(img=canvas,
-                                  pt1=(int(i * width_per_box)+1, y+1),
-                                  pt2=(int((i + 1) * width_per_box) - 1, y + HEIGHT_OF_BOXES_IN_ROWS - 1),
-                                  color=(255,255,255),
-                                  thickness=2)
-                cv2.putText(img=canvas,
-                            text=list_to_draw[i].letter,
-                            org=(int((i+0.5) * width_per_box - 5), y+15),
-                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                            fontScale=0.33,
-                            color=(0, 0, 0))
 
     def handle_add_button(self):
         if self.selected_color is not None:
