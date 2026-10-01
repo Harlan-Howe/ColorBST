@@ -4,7 +4,10 @@ import cv2
 
 
 class BSTColor:
-
+    """
+    A BSTColor basically consists of a randomized color and a random capital letter. The color may be accessed as the
+    color itself (a 3 element BGR tuple) or its hue, saturation, or brightness.
+    """
     def __init__(self):
         self.__BGR = (random.randint(32, 255), random.randint(32, 255), random.randint(32, 255))
         one_pixel = np.uint8([[self.__BGR]]) #  makes a 1 x 1 pixel graphic with the color
@@ -16,6 +19,12 @@ class BSTColor:
         self.__letter = chr(ord("A") + random.randint(0, 25))
         print (self.__letter)
 
+
+    #  Note: these "@property" tags are basically accessors for the variables that we start with double underscore
+    #        (dunder) names, which means they are meant to be private. These methods allow other classes to "get" these
+    #        variable's contents but not modify them. Through the magic of the "@property" precompiler tag, external
+    #        classes can refer to the variables by the name without parentheses. For example another class would say
+    #        "c = myColor.BGR_color" instead of "c = myColor.BGR_color()" or "c = myColor.__BGR."
     @property
     def BGR_color(self):
         return self.__BGR
