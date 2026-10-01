@@ -182,6 +182,7 @@ class ColorBSTDisplay:
                 for _ in range(32):
                     self.potential_colors.append(BSTColor())
             self.selected_color = None
+            self.message = "Added."
             self.display(wait_for_key=-1, destroy_windows=False)
 
     def handle_find_button(self):
