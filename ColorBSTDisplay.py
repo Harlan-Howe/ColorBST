@@ -29,6 +29,7 @@ class ColorBSTDisplay:
         self.dimensions = (800, WINDOW_WIDTH, 3)
         self.tree = t
         self.selected_color = None
+        self.message: Optional[str] = None
         cv2.namedWindow("Display")
         cv2.setMouseCallback("Display", self.handle_mouse_click)
 
@@ -67,11 +68,9 @@ class ColorBSTDisplay:
         #                     color=(0, 0, 0))
         self.tree.draw_self(canvas)
 
-        depth = self.tree.get_depth()
-        if depth != -1:
-            cv2.putText(img=canvas, text=f"Depth: {depth}", org=(10,150),
-                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color = (255,128,255))
+        self.draw_depth(canvas)
 
+        self.draw_message(canvas)
 
 
         self.showListInOrder(canvas)
@@ -85,6 +84,19 @@ class ColorBSTDisplay:
             cv2.waitKey(wait_for_key)
         if destroy_windows:
             cv2.destroyAllWindows()
+
+    def draw_message(self, canvas: Any):
+        if self.message is not None:
+            (w, h), bsln = cv2.getTextSize(text=self.message, fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75,
+                                           thickness=1)
+            cv2.putText(img=canvas, text=self.message, org=(WINDOW_WIDTH - 10 - w, TOP_OF_FORWARD_LIST - 5),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 255, 255))
+
+    def draw_depth(self, canvas: Any):
+        depth = self.tree.get_depth()
+        if depth != -1:
+            cv2.putText(img=canvas, text=f"Depth: {depth}", org=(10, 150),
+                        fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 128, 255))
 
     def draw_buttons(self, canvas: Any):
         cv2.rectangle(img=canvas,
@@ -173,18 +185,26 @@ class ColorBSTDisplay:
             self.display(wait_for_key=-1, destroy_windows=False)
 
     def handle_find_button(self):
-        if self.selected_color is None:
+        if self.selected_color is None or self.tree.root is None:
             return
         result:bool = self.tree.find(self.selected_color)
-        print(f"{result}")
+        if result:
+            self.message = "Found the color in the tree!"
+        else:
+            self.message = "The color is not in the tree!"
+        self.display(wait_for_key=-1, destroy_windows=False)
 
     def handle_remove_button(self):
-        if self.selected_color is None:
+        if self.selected_color is None or self.tree.root is None:
             return
         succeeded:bool = self.tree.remove(self.selected_color)
         if succeeded:
             self.added_colors.remove(self.selected_color)
             self.display(wait_for_key=-1, destroy_windows=False)
+            self.message = "Removed color from the tree!"
+        else:
+            self.message = "Could not remove: The color was not in the tree!"
+        self.display(wait_for_key=-1, destroy_windows=False)
 
 
 
