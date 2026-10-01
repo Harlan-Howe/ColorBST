@@ -5,6 +5,51 @@ import numpy as np
 
 from BSTColor import BSTColor
 
+
+class ColorTree:
+    def __init__(self):
+        self.root: Optional[ColorTreeNode] = None
+
+    def add(self, color: BSTColor):
+        if self.root is None:
+            self.root = ColorTreeNode(color=color)
+            self.root.isSelected = True
+        else:
+            self.root.add(color)
+
+    def draw_self(self, canvas: np.ndarray):
+        if self.root is None:
+            return
+        self.root.draw_self_in_box(canvas, min_x=0, max_x=canvas.shape[1], y=115)
+
+    def put_colors_in_list_forward(self, list: List[BSTColor]):
+        if self.root is not None:
+            self.root.get_colors_in_order(list)
+
+    def put_colors_in_list_reversed(self, list: List[BSTColor]):
+        if self.root is not None:
+            self.root.get_colors_in_reverse_order(list)
+
+    def get_depth(self) -> int:
+        if self.root is None:
+            return -1
+        else:
+            return self.root.get_depth() - 1
+
+    def find(self, target: BSTColor) -> bool:
+        if self.root is None:
+            return False
+        return self.root.find(target)
+
+    def remove(self, target: BSTColor) -> bool:
+        if self.root is None:
+            return False
+
+        return False  # replace this with your code.
+
+# =============================================================================================
+# =============================================================================================
+
 BOX_SIZE = 15
 VERTICAL_OFFSET = 40
 
@@ -103,45 +148,5 @@ class ColorTreeNode:
     def find(self, target: BSTColor) -> bool:
         return False
 
-    def remove(self, target: BSTColor) -> bool:
-        return False
 
-class ColorTree:
-    def __init__(self):
-        self.root : Optional[ColorTreeNode] = None
 
-    def add(self,color: BSTColor):
-        if self.root is None:
-            self.root = ColorTreeNode(color = color)
-            self.root.isSelected = True
-        else:
-            self.root.add(color)
-
-    def draw_self(self, canvas:np.ndarray):
-        if self.root is None:
-            return
-        self.root.draw_self_in_box(canvas, min_x=0, max_x = canvas.shape[1], y=115)
-
-    def put_colors_in_list_forward(self, list:List[BSTColor]):
-        if self.root is not None:
-            self.root.get_colors_in_order(list)
-
-    def put_colors_in_list_reversed(self, list:List[BSTColor]):
-        if self.root is not None:
-            self.root.get_colors_in_reverse_order(list)
-
-    def get_depth(self) -> int :
-        if self.root is None:
-            return -1
-        else:
-            return self.root.get_depth()-1
-
-    def find(self, target: BSTColor) -> bool:
-        if self.root is None:
-            return False
-        return self.root.find(target)
-
-    def remove(self, target: BSTColor) -> bool:
-        if self.root is None:
-            return False
-        return self.root.remove(target)
