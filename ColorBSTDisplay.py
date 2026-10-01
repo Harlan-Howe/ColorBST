@@ -188,7 +188,7 @@ class ColorBSTDisplay:
     def handle_find_button(self):
         if self.selected_color is None or self.tree.root is None:
             return
-        result:bool = self.tree.find(self.selected_color)
+        result:bool = self.tree.contains(self.selected_color)
         if result:
             self.message = "Found the color in the tree!"
         else:

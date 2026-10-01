@@ -5,43 +5,85 @@ import numpy as np
 
 from BSTColor import BSTColor
 
-
+"""
+Note: this file contains two classes, ColorTree and ColorTreeNode.
+"""
 class ColorTree:
     def __init__(self):
         self.root: Optional[ColorTreeNode] = None
 
-    def add(self, color: BSTColor):
+    def add(self, color: BSTColor) -> None:
+        """
+        adds a new node with the given color to the tree.
+        :param color: the BSTColor item to add
+        """
+        #  I have written this method for you, but you will need to write the content of ColorTreeNode.add().
         if self.root is None:
             self.root = ColorTreeNode(color=color)
             self.root.isSelected = True
         else:
             self.root.add(color)
 
-    def draw_self(self, canvas: np.ndarray):
+    def draw_self(self, canvas: np.ndarray) -> None:
+        """
+        Draws a representation of the tree in the canvas
+        :param canvas: the 2d x 3color ndarray in which to draw.
+        """
+        # I have written this method for you.
         if self.root is None:
             return
         self.root.draw_self_in_box(canvas, min_x=0, max_x=canvas.shape[1], y=115)
 
-    def put_colors_in_list_forward(self, list: List[BSTColor]):
+    def put_colors_in_list_forward(self, list: List[BSTColor]) -> None:
+        """
+        fills the given list with the contents of this tree in least -> greatest order.
+        :param list: a list in which to put the BSTColors held by this tree.
+        """
+        # I have written this method for you, but it relies on ColorTreeNode.get_colors_in_order(), which you will need
+        # to complete.
         if self.root is not None:
             self.root.get_colors_in_order(list)
 
-    def put_colors_in_list_reversed(self, list: List[BSTColor]):
+    def put_colors_in_list_reversed(self, list: List[BSTColor]) -> None:
+        """
+        fills the given list with the contents of this tree in greatest -> least order.
+        :param list: a list in which to put the BSTColors held by this tree.
+        """
+        # I have written this method for you, but it relies on ColorTreeNode.get_colors_in_reverse_order(), which you
+        # will need to complete.
         if self.root is not None:
             self.root.get_colors_in_reverse_order(list)
 
     def get_depth(self) -> int:
+        """
+        calculates the max depth of this tree.
+        :return: the depth
+        """
+        # I have written this method, but it is based on ColorTreeNode.get_depth(), which you will need to complete.
+        #   Note that I am subtracting one from the returned value, so that the root will be at depth 0.
         if self.root is None:
             return -1
         else:
             return self.root.get_depth() - 1
 
-    def find(self, target: BSTColor) -> bool:
+    def contains(self, target: BSTColor) -> bool:
+        """
+        deterimines whether the "target" BSTColor object is contained in this tree.
+        :param target: the BSTColor we are looking for.
+        :return: whether the given target color is part of this tree.
+        """
+        # I have written this method for you, but it relies on ColorTreeNode.contains(), which you will need to complete.
         if self.root is None:
             return False
-        return self.root.find(target)
+        return self.root.contains(target)
 
     def remove(self, target: BSTColor) -> bool:
+        """
+        Removes the given target BSTColor from this tree, if it is contained in it.
+        :param target: the BSTColor object to remove.
+        :return: whether we were able to remove the target color; if True, the number of items in this tree should have
+                 decreased by one.
+        """
         if self.root is None:
             return False
 
@@ -145,7 +187,7 @@ class ColorTreeNode:
             r = self.rightNode.get_depth()
         return d + max(l, r)
 
-    def find(self, target: BSTColor) -> bool:
+    def contains(self, target: BSTColor) -> bool:
         return False
 
 
