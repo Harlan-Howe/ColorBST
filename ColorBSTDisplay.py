@@ -78,7 +78,15 @@ class ColorBSTDisplay:
         if destroy_windows:
             cv2.destroyAllWindows()
 
-    def draw_row_of_boxes_for_list(self, canvas: np.ndarray, list_to_draw: List[BSTColor], y:int):
+    def draw_row_of_boxes_for_list(self, canvas: np.ndarray, list_to_draw: List[BSTColor], y:int) -> None:
+        """
+        draws the colors contained in "list_to_draw" into the canvas at the specified y value as a set of evenly spaced
+        boxes that fill the width of the window, each with the letter of the color displayed. If the color of a box is
+        the same as self.selectedColor, draws a white border around the box.
+        :param canvas: the 2d x 3 color ndarray in which to draw.
+        :param list_to_draw: a list of BSTColors we wish to represent in this row
+        :param y: the top edge of the boxes
+        """
         if len(list_to_draw) > 0:
             width_per_box = self.dimensions[1]/len(list_to_draw)
             for i in range(len(list_to_draw)):
@@ -100,26 +108,42 @@ class ColorBSTDisplay:
                             fontScale=0.33,
                             color=(0, 0, 0))
 
-    def draw_depth(self, canvas: Any):
+    def draw_depth(self, canvas: np.ndarray) -> None:
+        """
+        finds the depth of the tree, and if it isn't -1, puts a description on screen.
+        :param canvas: the 2d x 3 color ndarray in which to draw.
+        """
         depth = self.tree.get_depth()
         if depth != -1:
             cv2.putText(img=canvas, text=f"Depth: {depth}", org=(10, 150),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 128, 255))
 
-    def draw_size(self, canvas: Any):
+    def draw_size(self, canvas: np.ndarray) -> None:
+        """
+        finds the number of colors in the tree and puts a description on screen.
+        :param canvas: the 2d x 3 color ndarray in which to draw.
+        """
         size_string = f"Size: {self.tree.size()}"
         (w, h), bsln = cv2.getTextSize(text=size_string, fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, thickness=1)
         cv2.putText(img=canvas, text=size_string, org=(WINDOW_WIDTH - 10 - w, 150),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 128, 255))
 
-    def draw_message(self, canvas: Any):
+    def draw_message(self, canvas: np.ndarray) -> None:
+        """
+        draws the message string on the screen, if there is a message.
+        :param canvas: the 2d x 3 color ndarray in which to draw
+        """
         if self.message is not None:
             (w, h), bsln = cv2.getTextSize(text=self.message, fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75,
                                            thickness=1)
             cv2.putText(img=canvas, text=self.message, org=(WINDOW_WIDTH - 10 - w, TOP_OF_FORWARD_LIST - 5),
                         fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 255, 255))
 
-    def showListInOrder(self, canvas: Any):
+    def showListInOrder(self, canvas: np.ndarray) -> None:
+        """
+        requests a list of colors in ascending order from the tree. If it gets them, it draws them as a row.
+        :param canvas: the 2d x 3 color ndarray in which to draw
+        """
         self.sorted_colors = []
         self.tree.put_colors_in_list_forward(self.sorted_colors)
         if len(self.sorted_colors) > 0:
@@ -131,7 +155,11 @@ class ColorBSTDisplay:
                         color=(255, 255, 0))
             self.draw_row_of_boxes_for_list(canvas, self.sorted_colors, TOP_OF_FORWARD_LIST)
 
-    def show_list_in_reverse_order(self, canvas: Any):
+    def show_list_in_reverse_order(self, canvas: np.ndarray) -> None:
+        """
+        requests a list of colors in descending order from the tree. If it gets them, it draws them as a row.
+        :param canvas: the 2d x 3 color ndarray in which to draw
+        """
         self.reversed_colors = []
         self.tree.put_colors_in_list_reversed(self.reversed_colors)
 
@@ -144,7 +172,11 @@ class ColorBSTDisplay:
                         color=(255, 255, 0))
             self.draw_row_of_boxes_for_list(canvas, self.reversed_colors, TOP_OF_REVERSE_LIST)
 
-    def draw_buttons(self, canvas: Any):
+    def draw_buttons(self, canvas: np.ndarray) -> None:
+        """
+        draws the three buttons at the bottom of the screen.
+        :param canvas: the 2d x 3 color ndarray in which to draw
+        """
         cv2.rectangle(img=canvas,
                       pt1=(0, TOP_OF_BUTTONS),
                       pt2=(canvas.shape[1] // 3, TOP_OF_BUTTONS + BUTTON_HEIGHT),
@@ -172,7 +204,11 @@ class ColorBSTDisplay:
         cv2.putText(img=canvas, text="Remove", org=(5 * canvas.shape[1] // 6 - w // 2, 725 + h // 2),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1.5, color=(0, 0, 0))
 
-    def handle_add_button(self):
+    def handle_add_button(self) -> None:
+        """
+        the user just released the mouse inside the bounds of the "Add" rectangle. Add the currently selected color in
+        one of the rows to the tree.
+        """
         if self.selected_color is not None:
             self.tree.add(self.selected_color)
             self.added_colors.append(self.selected_color)
@@ -184,32 +220,54 @@ class ColorBSTDisplay:
             self.message = "Added."
             self.display(wait_for_key=-1, destroy_windows=False)
 
-    def handle_find_button(self):
-        if self.selected_color is None or self.tree.root is None:
-            return
-        self.tree.clear_all_selections()
-        result:bool = self.tree.contains(self.selected_color)
-        if result:
-            self.message = "Found the color in the tree!"
+    def handle_find_button(self) -> None:
+        """
+        the user just released the mouse inside the bounds of the "Find" rectangle. Call the tree's contains method,
+        passing along the currently selected color in one of the rows. Display a message whether this was successful.
+        """
+        if self.selected_color is None:
+            self.message = "No color selected to search for."
+        elif self.tree.isEmpty():
+            self.message = "Tree is empty."
         else:
-            self.message = "The color is not in the tree!"
+            self.tree.clear_all_selections()
+            result:bool = self.tree.contains(self.selected_color)
+            if result:
+                self.message = "Found the color in the tree!"
+            else:
+                self.message = "The color is not in the tree!"
         self.display(wait_for_key=-1, destroy_windows=False)
 
-    def handle_remove_button(self):
-        if self.selected_color is None or self.tree.root is None:
-            return
-        succeeded:bool = self.tree.remove(self.selected_color)
-        if succeeded:
-            self.added_colors.remove(self.selected_color)
-            self.display(wait_for_key=-1, destroy_windows=False)
-            self.message = "Removed color from the tree!"
+    def handle_remove_button(self) -> None:
+        """
+        the user has just released the mouse inside the "remove" box. Attempt to remove the currently
+        selected color from the tree, and report back on whether this was successful or not.
+        """
+        if self.selected_color is None:
+            self.message = "No color selected to remove."
+        elif self.tree.isEmpty():
+            self.message = "Tree is empty."
         else:
-            self.message = "Could not remove: The color was not in the tree!"
+            succeeded:bool = self.tree.remove(self.selected_color)
+            if succeeded:
+                self.added_colors.remove(self.selected_color)
+                self.display(wait_for_key=-1, destroy_windows=False)
+                self.message = "Removed color from the tree!"
+            else:
+                self.message = "Could not remove: The color was not in the tree!"
         self.display(wait_for_key=-1, destroy_windows=False)
 
 
 
-    def handle_mouse_click(self, event, x, y, flags, param):
+    def handle_mouse_click(self, event: int, x: int, y: int, flags: int, param:Any) -> None:
+        """
+        the user has just done something with the mouse. Respond to it.
+        :param event: what sort of thing did the user do?
+        :param x: x coordinate of mouse within window when they did it.
+        :param y: y coordinate of mouse within window when they did it.
+        :param flags: required, but not used in this program. (modifier keys?)
+        :param param: required, but not used in this program.
+        """
         if event == cv2.EVENT_LBUTTONUP:
             print(f"Mouse clicked at ({x}, {y}).")
             if TOP_OF_POTENTIAL_LIST <= y <= TOP_OF_POTENTIAL_LIST+HEIGHT_OF_BOXES_IN_ROWS:
