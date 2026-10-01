@@ -147,7 +147,7 @@ class ColorTreeNode:
         #  to add this, or create a child with this color. To start with, you'll need one of the following, depending
         #  on what you want to sort by:
 
-        # if color.hue < self.value.hue:
+        # if color.hue < self.value.hue:  # Recommended
         # or
         # if color.letter < self.value.letter:
         # or
