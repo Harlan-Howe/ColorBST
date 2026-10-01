@@ -89,6 +89,16 @@ class ColorTree:
 
         return False  # replace this with your code.
 
+    def size(self) -> int:
+        """
+        :return: the number of BSTColors in this tree.
+        """
+        #  I have written this method for you.
+        if self.root is None:
+            return 0
+        return self.root.size()
+
+
 # =============================================================================================
 # =============================================================================================
 
@@ -190,5 +200,15 @@ class ColorTreeNode:
     def contains(self, target: BSTColor) -> bool:
         return False
 
+    def size(self) -> int:
+        """
+        :return: the number of BSTColor objects in the subtree rooted by this node.
+        """
+        result = 1
+        if self.leftNode is not None:
+            result += self.leftNode.size()
+        if self.rightNode is not None:
+            result += self.rightNode.size()
+        return result
 
 
